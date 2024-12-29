@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, ScrollView, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
-export default function UserScreen() {
+export default function UserScreen({ navigation }: any) {
   const [token, setToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const getToken = async () => {
@@ -52,6 +62,34 @@ export default function UserScreen() {
     fetchUserData();
   }, [token]);
 
+  const handleLogout = async () => {
+    if (!token) {
+      Alert.alert("Lỗi", "Không tìm thấy token");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://192.168.1.236:8080/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        await AsyncStorage.removeItem("token");
+        Alert.alert("Thông báo", "Đăng xuất thành công!");
+        router.push("/login");
+      } else {
+        const data = await response.json();
+        Alert.alert("Lỗi", data.message || "Có lỗi xảy ra khi đăng xuất");
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Có lỗi xảy ra khi gọi API");
+    }
+  };
+
   if (!userData) {
     return (
       <View style={styles.loadingContainer}>
@@ -92,6 +130,15 @@ export default function UserScreen() {
         <Text style={styles.infoLabel}>Lớp:</Text>
         <Text style={styles.infoValue}>{userData.lopCQ}</Text>
       </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+          <Text style={styles.buttonText}>Đăng xuất</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.headerButton}>
+          <Text style={styles.buttonText}>Thay đổi mật khẩu</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
@@ -116,7 +163,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 3,
     marginTop: 40,
   },
   avatar: {
@@ -157,5 +204,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  buttonContainer: {
+    width: "100%",
+    paddingHorizontal: 35,
+    marginTop: 20,
+  },
+  headerButton: {
+    backgroundColor: "#00C27C",
+    paddingVertical: 12,
+    borderRadius: 5,
+    marginBottom: 10,
+    alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "#fff",
   },
 });

@@ -3,7 +3,6 @@ import MapView, { Callout, Marker } from "react-native-maps";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function MapScreen() {
-
   return (
     <View style={styles.container}>
       <MapView
