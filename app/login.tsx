@@ -39,9 +39,9 @@ export default function LoginScreen() {
 
     try {
       const encryptedPayload = encryptDataAES(payload, KEY);
-      // console.log(encryptedPayload);
+      console.log("DAta: ", encryptedPayload);
       try {
-        const response = await fetch("http://192.168.1.236:8080/register", {
+        const response = await fetch("http://192.168.1.236:8080/authenticate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
