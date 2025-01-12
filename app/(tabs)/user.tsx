@@ -78,6 +78,7 @@ export default function UserScreen({ navigation }: any) {
       });
 
       if (response.ok) {
+        ` `;
         await AsyncStorage.removeItem("token");
         Alert.alert("Thông báo", "Đăng xuất thành công!");
         router.push("/login");

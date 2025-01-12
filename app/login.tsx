@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { encryptDataAES } from "../util/encryp";
+import { KEY } from "@env"; // Import biến từ .env
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -16,6 +18,10 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    console.log("running login screen");
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -25,33 +31,69 @@ export default function LoginScreen() {
 
     setLoading(true);
 
+    const payload = {
+      email: email,
+      passWord: password,
+    };
+
     try {
-      const response = await fetch("http://192.168.1.236:8080/authenticate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          passWord: password,
-        }),
-      });
+      const encryptedPayload = encryptDataAES(payload, KEY);
+      // console.log(encryptedPayload);
+      try {
+        const response = await fetch("http://192.168.1.236:8080/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: {
+            encryptedPayload, // Gửi dữ liệu đã mã hóa
+          },
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (response.status === 200 && result.token) {
-        await AsyncStorage.setItem("token", result.token);
-        Alert.alert("Thành công", "Đăng nhập thành công!");
+        if (response.status === 200 && result.token) {
+          await AsyncStorage.setItem("token", result.token);
+          Alert.alert("Thành công", "Đăng nhập thành công!");
 
-        router.push("/(tabs)/calendar");
-      } else {
-        Alert.alert("Thất bại", result.message || "Sai email hoặc mật khẩu");
+          router.push("/(tabs)/calendar");
+        } else {
+          Alert.alert("Thất bại", result.message || "Sai email hoặc mật khẩu");
+        }
+      } catch (error) {
+        Alert.alert("Lỗi", "Không thể kết nối tới server.");
       }
     } catch (error) {
-      Alert.alert("Lỗi", "Không thể kết nối tới server.");
-    } finally {
-      setLoading(false);
+      Alert.alert("Lỗi", "Không thể mã hóa thông tin.");
     }
+
+    // try {
+    //   const response = await fetch("http://192.168.1.236:8080/login", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       email: email,
+    //       passWord: password,
+    //     }),
+    //   });
+
+    //   const result = await response.json();
+
+    //   if (response.status === 200 && result.token) {
+    //     await AsyncStorage.setItem("token", result.token);
+    //     Alert.alert("Thành công", "Đăng nhập thành công!");
+
+    //     router.push("/(tabs)/calendar");
+    //   } else {
+    //     Alert.alert("Thất bại", result.message || "Sai email hoặc mật khẩu");
+    //   }
+    // } catch (error) {
+    //   Alert.alert("Lỗi", "Không thể kết nối tới server.");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
