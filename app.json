@@ -30,6 +30,16 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "expo": {
+    "plugins": [
+      [ 
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allowed to use Face ID."
+        }
+      ]
+    ]
+  }
   }
 }
