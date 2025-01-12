@@ -1,5 +1,5 @@
-import CryptoJS from "crypto-js";
 import 'react-native-get-random-values';
+import CryptoJS from "crypto-js";
 
 export const encryptDataAES = (data, key) => {
   try {

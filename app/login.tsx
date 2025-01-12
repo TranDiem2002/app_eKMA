@@ -38,16 +38,16 @@ export default function LoginScreen() {
 
     try {
       const encryptedPayload = encryptDataAES(payload, KEY);
-      // console.log(encryptedPayload);
+      console.log("DAta: ", encryptedPayload);
       try {
-        const response = await fetch("http://192.168.1.236:8080/register", {
+        const response = await fetch("http://192.168.1.236:8080/authenticate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: {
-            encryptedPayload, // Gửi dữ liệu đã mã hóa
-          },
+          body: JSON.stringify(
+            encryptedPayload // Gửi dữ liệu đã mã hóa
+          ),
         });
 
         const result = await response.json();
@@ -66,34 +66,6 @@ export default function LoginScreen() {
     } catch (error) {
       Alert.alert("Lỗi", "Không thể mã hóa thông tin.");
     }
-
-    // try {
-    //   const response = await fetch("http://192.168.1.236:8080/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       email: email,
-    //       passWord: password,
-    //     }),
-    //   });
-
-    //   const result = await response.json();
-
-    //   if (response.status === 200 && result.token) {
-    //     await AsyncStorage.setItem("token", result.token);
-    //     Alert.alert("Thành công", "Đăng nhập thành công!");
-
-    //     router.push("/(tabs)/calendar");
-    //   } else {
-    //     Alert.alert("Thất bại", result.message || "Sai email hoặc mật khẩu");
-    //   }
-    // } catch (error) {
-    //   Alert.alert("Lỗi", "Không thể kết nối tới server.");
-    // } finally {
-    //   setLoading(false);
-    // }
   };
 
   return (
