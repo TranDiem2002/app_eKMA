@@ -9,18 +9,23 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function UserScreen({ navigation }: any) {
   const [token, setToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<any>(null);
   const router = useRouter();
+  const pathName = usePathname();
+  const currentPath = '/user';
+  
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
 
   useEffect(() => {
-    getToken();
-  }, []);
+    if(pathName === currentPath && !token) {
+      getToken();
+    };
+  }, [pathName]);
 
   useEffect(() => {
     if(!token) return;
@@ -37,7 +42,6 @@ export default function UserScreen({ navigation }: any) {
   }, [isBiometricSupported]);
 
   const getUserPermission = async (callback) => {
-    try {
       setIsBiometricSupported(false);
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: 'Xin xác thực',
@@ -51,10 +55,6 @@ export default function UserScreen({ navigation }: any) {
       } else {
         Alert.alert('Xác thực đã thất bại', 'Xin hãy thử lại');
       }
-    } catch (error) {
-      console.error('Xác thực lỗi:', error);
-      Alert.alert('Lỗi', 'Lỗi xảy ra trong quá trình Xác thực');
-    }
   };
 
   const fetchUserData = async () => {
@@ -80,7 +80,6 @@ export default function UserScreen({ navigation }: any) {
   };
 
   const getToken = async () => {
-    console.log('running getToken');
     try {
       const savedToken = await AsyncStorage.getItem('token');
       if (savedToken) {
@@ -165,9 +164,6 @@ export default function UserScreen({ navigation }: any) {
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
           <Text style={styles.buttonText}>Đăng xuất</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.headerButton}>
-          <Text style={styles.buttonText}>Thay đổi mật khẩu</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

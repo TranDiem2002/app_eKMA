@@ -17,7 +17,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.eKMA.package"
     },
     "web": {
       "bundler": "metro",
@@ -26,20 +27,37 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minifyEnabled": true,
+            "enableProguardInReleaseBuilds": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "expo": {
-    "plugins": [
-      [ 
-        "expo-local-authentication",
-        {
-          "faceIDPermission": "Allowed to use Face ID."
-        }
+      "plugins": [
+        [
+          "expo-local-authentication",
+          {
+            "faceIDPermission": "Allowed to use Face ID."
+          }
+        ]
       ]
-    ]
-  }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "353ba1a8-2b19-447f-b87b-8a3c8019cc81"
+      }
+    }
   }
 }
