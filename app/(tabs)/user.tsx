@@ -66,7 +66,7 @@ export default function UserScreen({ navigation }: any) {
   const fetchUserData = async () => {
     if (token) {
       try {
-        const response = await fetch('http://192.168.76.82:8080/user/detail', {
+        const response = await fetch('http://172.20.10.2:8080/user/detail', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ export default function UserScreen({ navigation }: any) {
     }
 
     try {
-      const response = await fetch('http://192.168.76.82:8080/logout', {
+      const response = await fetch('http://172.20.10.2:8080/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ export default function UserScreen({ navigation }: any) {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleActivate2FA} style={styles.headerButton}>
+        <TouchableOpacity style={styles.buttonDisable}>
           <Text style={styles.buttonText}>Xác thực 2 lớp</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
@@ -191,6 +191,14 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#F1FFF3',
+    alignItems: 'center',
+  },
+  buttonDisable: {
+    opacity: 0.4,
+    backgroundColor: '#00C27C',
+    paddingVertical: 12,
+    borderRadius: 5,
+    marginBottom: 10,
     alignItems: 'center',
   },
   profileHeader: {

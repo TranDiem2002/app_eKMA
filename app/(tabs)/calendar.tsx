@@ -50,7 +50,7 @@ export default function CalendarScreen() {
       if (token) {
         try {
           const response = await fetch(
-            "http://192.168.76.82:8080/calendar/getAll",
+            "http://172.20.10.2:8080/calendar/getAll",
             {
               method: "POST",
               headers: {
