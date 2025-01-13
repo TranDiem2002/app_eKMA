@@ -30,7 +30,6 @@ export default function LoginScreen() {
     }
 
     setLoading(true);
-    router.push("/(tabs)/calendar");
 
     const payload = {
       email: email,
@@ -39,21 +38,21 @@ export default function LoginScreen() {
 
     try {
       const encryptedPayload = encryptDataAES(payload, KEY);
-      console.log("DAta: ", encryptedPayload);
       try {
         const response = await fetch("http://192.168.1.236:8080/authenticate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
+          body: JSON.stringify(
             encryptedPayload, // Gửi dữ liệu đã mã hóa
-          }) ,
+          ) ,
         });
 
         const result = await response.json();
 
         if (response.status === 200 && result.token) {
+
           await AsyncStorage.setItem("token", result.token);
           Alert.alert("Thành công", "Đăng nhập thành công!");
 

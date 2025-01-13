@@ -11,53 +11,61 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, usePathname } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { decryptDataAES } from '@/util/encryp';
+import { compatibilityFlags } from 'react-native-screens';
 
 export default function UserScreen({ navigation }: any) {
   const [token, setToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<any>(null);
   const router = useRouter();
   const pathName = usePathname();
+  const isSuccessfullyAuthenticated = compatibilityFlags;
   const currentPath = '/user';
   
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
 
   useEffect(() => {
-    if(pathName === currentPath && !token) {
+    if(!token) {
       getToken();
-    };
-  }, [pathName]);
-
-  useEffect(() => {
-    if(!token) return;
-
-    (async () => {
-      const compatible = await LocalAuthentication.hasHardwareAsync();
-      setIsBiometricSupported(compatible);
-    })();
+    } 
+    
   }, [token]);
 
   useEffect(() => {
-    if(isBiometricSupported && token) return;
-    getUserPermission(fetchUserData());
+    if(token && pathName === currentPath) 
+    {
+      console.log('running compatible');
+      (async () => {
+        const compatible = await LocalAuthentication.hasHardwareAsync();
+        setIsBiometricSupported(compatible);
+      })();
+    }
+  }, [token, pathName]);
+
+
+  useEffect(() => {
+    if(!(isBiometricSupported && pathName === currentPath)) return;
+    getUserPermission(fetchUserData);
   }, [isBiometricSupported]);
 
   const getUserPermission = async (callback) => {
-      setIsBiometricSupported(false);
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: 'Xin xác thực',
         disableDeviceFallback: false, // This enables fallback to device passcode
         fallbackLabel: 'Xin hãy nhập mật khẩu',
         cancelLabel: 'Hủy bỏ',
       });
-
+      
       if (result.success) {
         callback();
+
       } else {
         Alert.alert('Xác thực đã thất bại', 'Xin hãy thử lại');
       }
   };
 
   const fetchUserData = async () => {
+    console.log('running fetchUserData', token);
     if (token) {
       try {
         const response = await fetch('http://192.168.1.236:8080/user/detail', {
@@ -69,6 +77,10 @@ export default function UserScreen({ navigation }: any) {
         });
         const data = await response.json();
         if (response.ok) {
+          Object.keys(data).forEach(key => {
+            data[key] = decryptDataAES(data[key]);
+          });
+
           setUserData(data);
         } else {
           Alert.alert('Lỗi', 'Không thể lấy thông tin người dùng');
@@ -84,6 +96,7 @@ export default function UserScreen({ navigation }: any) {
       const savedToken = await AsyncStorage.getItem('token');
       if (savedToken) {
         setToken(savedToken);
+        console.log('savedToken: ', savedToken);
       } else {
         Alert.alert('Lỗi', 'Không tìm thấy token');
       }
