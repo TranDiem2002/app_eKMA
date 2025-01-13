@@ -19,10 +19,6 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    console.log("running login screen");
-  }, []);
-
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Lỗi", "Vui lòng nhập đầy đủ email và mật khẩu");
@@ -39,7 +35,7 @@ export default function LoginScreen() {
     try {
       const encryptedPayload = encryptDataAES(payload, KEY);
       try {
-        const response = await fetch("http://192.168.1.236:8080/authenticate", {
+        const response = await fetch("http://172.20.10.2:8080/authenticate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -54,9 +50,12 @@ export default function LoginScreen() {
         if (response.status === 200 && result.token) {
 
           await AsyncStorage.setItem("token", result.token);
-          Alert.alert("Thành công", "Đăng nhập thành công!");
-
-          router.push("/(tabs)/calendar");
+          const is2FAEnabled = await handleCheck(result.token);
+          if(is2FAEnabled) {
+            router.push("/verify2FA");
+          } else {
+            router.push("/(tabs)/calendar");
+          }
         } else {
           Alert.alert("Thất bại", result.message || "Sai email hoặc mật khẩu");
         }
@@ -68,6 +67,33 @@ export default function LoginScreen() {
     }
 
   };
+  const handleCheck = async (token: string) => {
+    console.log('token', token);
+    try {
+          const response = await fetch("http://172.20.10.2:8080/2fa/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        
+      });
+
+      const result = await response.json();
+
+      if (response.status === 200) {
+
+
+        return true;
+      } else {
+        Alert.alert("Thất bại", result.message || "Sai email hoặc mật khẩu");
+        return false;
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể kết nối tới server.");
+      return false;
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -116,7 +142,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    color: "#FFFFFF",
+    color: "#FFFFFF", 
     fontWeight: "bold",
     marginBottom: 40,
   },

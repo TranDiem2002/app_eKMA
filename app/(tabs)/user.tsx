@@ -34,7 +34,6 @@ export default function UserScreen({ navigation }: any) {
   useEffect(() => {
     if(token && pathName === currentPath) 
     {
-      console.log('running compatible');
       (async () => {
         const compatible = await LocalAuthentication.hasHardwareAsync();
         setIsBiometricSupported(compatible);
@@ -65,10 +64,9 @@ export default function UserScreen({ navigation }: any) {
   };
 
   const fetchUserData = async () => {
-    console.log('running fetchUserData', token);
     if (token) {
       try {
-        const response = await fetch('http://192.168.1.236:8080/user/detail', {
+        const response = await fetch('http://192.168.76.82:8080/user/detail', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -96,7 +94,6 @@ export default function UserScreen({ navigation }: any) {
       const savedToken = await AsyncStorage.getItem('token');
       if (savedToken) {
         setToken(savedToken);
-        console.log('savedToken: ', savedToken);
       } else {
         Alert.alert('Lỗi', 'Không tìm thấy token');
       }
@@ -112,7 +109,7 @@ export default function UserScreen({ navigation }: any) {
     }
 
     try {
-      const response = await fetch('http://192.168.1.236:8080/logout', {
+      const response = await fetch('http://192.168.76.82:8080/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,6 +136,10 @@ export default function UserScreen({ navigation }: any) {
         <Text>Loading...</Text>
       </View>
     );
+  }
+
+  const handleActivate2FA = () => {
+    router.push('/setUp2FA');
   }
 
   return (
@@ -175,6 +176,9 @@ export default function UserScreen({ navigation }: any) {
       </View>
 
       <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleActivate2FA} style={styles.headerButton}>
+          <Text style={styles.buttonText}>Xác thực 2 lớp</Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
           <Text style={styles.buttonText}>Đăng xuất</Text>
         </TouchableOpacity>
@@ -251,6 +255,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   headerButton: {
+    opacity: 1.6,
     backgroundColor: '#00C27C',
     paddingVertical: 12,
     borderRadius: 5,

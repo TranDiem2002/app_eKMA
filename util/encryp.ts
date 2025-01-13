@@ -32,7 +32,6 @@ export const encryptDataAES = (data: { email: string; passWord: string; }, key: 
 };
 
 export const decryptDataAES = (encryptedData: string | CryptoJS.lib.CipherParams, key: string = KEY) => {
-  console.log(encryptedData);
   try {
     if (encryptedData === undefined || encryptedData === null) {
       console.error("Encrypted data, key, and IV are required");
@@ -47,7 +46,6 @@ export const decryptDataAES = (encryptedData: string | CryptoJS.lib.CipherParams
 
     // Convert decrypted data to string
     const decryptedData = decrypted.toString(CryptoJS.enc.Utf8);
-    console.log('decryptedData: ', decrypted);
     // Parse JSON if the decrypted data is a JSON string
     try {
       return JSON.parse(decryptedData);
