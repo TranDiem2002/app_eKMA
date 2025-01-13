@@ -48,9 +48,10 @@ export default function CalendarScreen() {
   useEffect(() => {
     const fetchEvents = async () => {
       if (token) {
+        console.log("token:", token);
         try {
           const response = await fetch(
-            "http://192.168.76.82:8080/calendar/getAll",
+            "http://172.20.10.2:8080/calendar/getAll",
             {
               method: "POST",
               headers: {

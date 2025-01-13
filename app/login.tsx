@@ -41,14 +41,13 @@ export default function LoginScreen() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(
-            encryptedPayload, // Gửi dữ liệu đã mã hóa
-          ) ,
+            encryptedPayload // Gửi dữ liệu đã mã hóa
+          ),
         });
 
         const result = await response.json();
 
         if (response.status === 200 && result.token) {
-
           await AsyncStorage.setItem("token", result.token);
           const is2FAEnabled = await handleCheck(result.token);
           if(is2FAEnabled) {
@@ -65,7 +64,6 @@ export default function LoginScreen() {
     } catch (error) {
       Alert.alert("Lỗi", "Không thể mã hóa thông tin.");
     }
-
   };
   const handleCheck = async (token: string) => {
     console.log('token', token);

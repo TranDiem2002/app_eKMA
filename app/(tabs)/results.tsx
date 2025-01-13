@@ -54,7 +54,7 @@ export default function ResultsScreen() {
       if (token) {
         try {
           const response = await fetch(
-            "http://192.168.76.82:8080/user/getAllDiem",
+            "http://172.20.10.2:8080/user/getAllDiem",
             {
               method: "POST",
               headers: {
@@ -96,17 +96,14 @@ export default function ResultsScreen() {
 
   const fetchYearDetails = async (namhoc: number) => {
     try {
-      const response = await fetch(
-        "http://192.168.76.82:8080/get/hockidetail",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(namhoc),
-        }
-      );
+      const response = await fetch("http://172.20.10.2:8080/get/hockidetail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(namhoc),
+      });
 
       const data = await response.json();
       if (data) {

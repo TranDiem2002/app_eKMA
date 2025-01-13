@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter, usePathname } from 'expo-router';
-import * as LocalAuthentication from 'expo-local-authentication';
-import { decryptDataAES } from '@/util/encryp';
-import { compatibilityFlags } from 'react-native-screens';
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter, usePathname } from "expo-router";
+import * as LocalAuthentication from "expo-local-authentication";
+import { decryptDataAES } from "@/util/encryp";
+import { compatibilityFlags } from "react-native-screens";
 
 export default function UserScreen({ navigation }: any) {
   const [token, setToken] = useState<string | null>(null);
@@ -20,20 +20,19 @@ export default function UserScreen({ navigation }: any) {
   const router = useRouter();
   const pathName = usePathname();
   const isSuccessfullyAuthenticated = compatibilityFlags;
-  const currentPath = '/user';
-  
+  const currentPath = "/user";
+
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
 
   useEffect(() => {
-    if(!token) {
+    if (!token) {
       getToken();
-    } 
-    
+    }
   }, [token]);
 
   useEffect(() => {
-    if(token && pathName === currentPath) 
-    {
+    if (token && pathName === currentPath) {
+      console.log("running compatible");
       (async () => {
         const compatible = await LocalAuthentication.hasHardwareAsync();
         setIsBiometricSupported(compatible);
@@ -41,92 +40,91 @@ export default function UserScreen({ navigation }: any) {
     }
   }, [token, pathName]);
 
-
   useEffect(() => {
-    if(!(isBiometricSupported && pathName === currentPath)) return;
+    if (!(isBiometricSupported && pathName === currentPath)) return;
     getUserPermission(fetchUserData);
   }, [isBiometricSupported]);
 
   const getUserPermission = async (callback) => {
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Xin xác thực',
-        disableDeviceFallback: false, // This enables fallback to device passcode
-        fallbackLabel: 'Xin hãy nhập mật khẩu',
-        cancelLabel: 'Hủy bỏ',
-      });
-      
-      if (result.success) {
-        callback();
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Xin xác thực",
+      disableDeviceFallback: false, // This enables fallback to device passcode
+      fallbackLabel: "Xin hãy nhập mật khẩu",
+      cancelLabel: "Hủy bỏ",
+    });
 
-      } else {
-        Alert.alert('Xác thực đã thất bại', 'Xin hãy thử lại');
-      }
+    if (result.success) {
+      callback();
+    } else {
+      Alert.alert("Xác thực đã thất bại", "Xin hãy thử lại");
+    }
   };
 
   const fetchUserData = async () => {
+    console.log("running fetchUserData", token);
     if (token) {
       try {
-        const response = await fetch('http://192.168.76.82:8080/user/detail', {
-          method: 'POST',
+        const response = await fetch("http://172.20.10.2:8080/user/detail", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
         const data = await response.json();
         if (response.ok) {
-          Object.keys(data).forEach(key => {
+          Object.keys(data).forEach((key) => {
             data[key] = decryptDataAES(data[key]);
           });
 
           setUserData(data);
         } else {
-          Alert.alert('Lỗi', 'Không thể lấy thông tin người dùng');
+          Alert.alert("Lỗi", "Không thể lấy thông tin người dùng");
         }
       } catch (error) {
-        Alert.alert('Lỗi', 'Có lỗi xảy ra khi gọi API');
+        Alert.alert("Lỗi", "Có lỗi xảy ra khi gọi API");
       }
     }
   };
 
   const getToken = async () => {
     try {
-      const savedToken = await AsyncStorage.getItem('token');
+      const savedToken = await AsyncStorage.getItem("token");
       if (savedToken) {
         setToken(savedToken);
       } else {
-        Alert.alert('Lỗi', 'Không tìm thấy token');
+        Alert.alert("Lỗi", "Không tìm thấy token");
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể lấy token từ bộ nhớ');
+      Alert.alert("Lỗi", "Không thể lấy token từ bộ nhớ");
     }
   };
 
   const handleLogout = async () => {
     if (!token) {
-      Alert.alert('Lỗi', 'Không tìm thấy token');
+      Alert.alert("Lỗi", "Không tìm thấy token");
       return;
     }
 
     try {
-      const response = await fetch('http://192.168.76.82:8080/logout', {
-        method: 'POST',
+      const response = await fetch("http://172.20.10.2:8080/logout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
-        await AsyncStorage.removeItem('token');
-        Alert.alert('Thông báo', 'Đăng xuất thành công!');
-        router.push('/login');
+        await AsyncStorage.removeItem("token");
+        Alert.alert("Thông báo", "Đăng xuất thành công!");
+        router.push("/login");
       } else {
         const data = await response.json();
-        Alert.alert('Lỗi', data.message || 'Có lỗi xảy ra khi đăng xuất');
+        Alert.alert("Lỗi", data.message || "Có lỗi xảy ra khi đăng xuất");
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Có lỗi xảy ra khi gọi API');
+      Alert.alert("Lỗi", "Có lỗi xảy ra khi gọi API");
     }
   };
 
@@ -139,8 +137,8 @@ export default function UserScreen({ navigation }: any) {
   }
 
   const handleActivate2FA = () => {
-    router.push('/setUp2FA');
-  }
+    router.push("/setUp2FA");
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -148,7 +146,7 @@ export default function UserScreen({ navigation }: any) {
         <View style={styles.avatarContainer}>
           <Image
             style={styles.avatar}
-            source={require('@/assets/images/avatar.jpg')}
+            source={require("@/assets/images/avatar.jpg")}
           />
         </View>
         <Text style={styles.name}>{userData.name}</Text>
@@ -176,7 +174,10 @@ export default function UserScreen({ navigation }: any) {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleActivate2FA} style={styles.headerButton}>
+        <TouchableOpacity
+          onPress={handleActivate2FA}
+          style={styles.headerButton}
+        >
           <Text style={styles.buttonText}>Xác thực 2 lớp</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
@@ -190,13 +191,13 @@ export default function UserScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#F1FFF3',
-    alignItems: 'center',
+    backgroundColor: "#F1FFF3",
+    alignItems: "center",
   },
   profileHeader: {
-    backgroundColor: '#00C27C',
-    width: '100%',
-    alignItems: 'center',
+    backgroundColor: "#00C27C",
+    width: "100%",
+    alignItems: "center",
     paddingVertical: 40,
     marginBottom: 20,
   },
@@ -204,9 +205,9 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 3,
     marginTop: 40,
   },
@@ -217,15 +218,15 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   studentId: {
     fontSize: 14,
-    color: '#fff',
+    color: "#fff",
   },
   infoContainer: {
-    width: '100%',
+    width: "100%",
     borderRadius: 50,
     paddingLeft: 35,
     paddingTop: 10,
@@ -234,36 +235,35 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
     marginBottom: 5,
   },
   infoValue: {
     paddingLeft: 15,
     fontSize: 16,
-    color: '#999999',
+    color: "#999999",
     marginBottom: 20,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonContainer: {
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 35,
     marginTop: 20,
   },
   headerButton: {
-    opacity: 1.6,
-    backgroundColor: '#00C27C',
+    backgroundColor: "#00C27C",
     paddingVertical: 12,
     borderRadius: 5,
     marginBottom: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
     fontSize: 16,
-    color: '#fff',
+    color: "#fff",
   },
 });
