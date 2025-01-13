@@ -26,7 +26,8 @@ const TwoFactorSetupScreen = () => {
 
   const handleVerify2FA = async () => {
     try {
-      const response = await fetch('http://192.168.1.236:8080/2fa/verify-otp', {
+      console.log('token: ', token);
+      const response = await fetch('http://172.20.10.2:8080/2fa/verify-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +41,7 @@ const TwoFactorSetupScreen = () => {
         router.push('/(tabs)/results');
       }
     } catch (error) {
-      console.error(Error);
+      console.error('verify-otp', Error);
 
     }
   };
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     fontSize: 16,
-    width: '80%', // Adjust width to fit nicely in the layout
+    width: '100%', // Adjust width to fit nicely in the layout
     marginBottom: 16,
     marginTop: 16,
   },
