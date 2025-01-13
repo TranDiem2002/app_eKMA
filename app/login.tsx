@@ -49,8 +49,8 @@ export default function LoginScreen() {
 
         if (response.status === 200 && result.token) {
           await AsyncStorage.setItem("token", result.token);
-          const is2FAEnabled = await handleCheck(result.token);
-          if(is2FAEnabled) {
+          const is2FA = await handleCheck(result.token);
+          if(!is2FA) {
             router.push("/verify2FA");
           } else {
             router.push("/(tabs)/calendar");
@@ -84,11 +84,9 @@ export default function LoginScreen() {
 
         return true;
       } else {
-        Alert.alert("Thất bại", result.message || "Sai email hoặc mật khẩu");
         return false;
       }
     } catch (error) {
-      Alert.alert("Lỗi", "Không thể kết nối tới server.");
       return false;
     }
   }

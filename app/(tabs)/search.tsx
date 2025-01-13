@@ -42,7 +42,7 @@ export default function SearchScreen() {
   const fetchStudents = async (query: any) => {
     try {
       const response = await fetch(
-        `http://192.168.76.82:8080/search/${query}`,
+        `http://172.20.10.2:8080/search/${query}`,
         {
           method: "POST",
           headers: {

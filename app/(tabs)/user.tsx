@@ -174,10 +174,7 @@ export default function UserScreen({ navigation }: any) {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={handleActivate2FA}
-          style={styles.headerButton}
-        >
+        <TouchableOpacity style={styles.buttonDisable}>
           <Text style={styles.buttonText}>Xác thực 2 lớp</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
@@ -192,6 +189,14 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: "#F1FFF3",
+    alignItems: "center",
+  },
+  buttonDisable: {
+    opacity: 0.4,
+    backgroundColor: "#00C27C",
+    paddingVertical: 12,
+    borderRadius: 5,
+    marginBottom: 10,
     alignItems: "center",
   },
   profileHeader: {
