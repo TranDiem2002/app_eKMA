@@ -40,7 +40,7 @@ const TwoFactorSetupScreen = () => {
         router.push("/(tabs)/results");
       }
     } catch (error) {
-      console.error("error: ", Error);
+      console.error("verify-otp", Error);
     }
   };
 
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     fontSize: 16,
-    width: "80%", // Adjust width to fit nicely in the layout
+    width: "100%", // Adjust width to fit nicely in the layout
     marginBottom: 16,
     marginTop: 16,
   },

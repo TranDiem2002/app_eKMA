@@ -53,8 +53,7 @@ const TwoFactorSetupScreen = () => {
 
   const handleEnable2FA = async () => {
     try {
-      console.log("verificationCode: ", verificationCode);
-      const response = await fetch("http://192.168.76.82:8080/2fa/verify-otp", {
+      const response = await fetch("http://172.20.10.2:8080/2fa/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +67,7 @@ const TwoFactorSetupScreen = () => {
         setIsScanned(true);
       }
     } catch (error) {
-      console.error(Error);
+      console.error("verify-otp: ", Error);
     }
   };
 
